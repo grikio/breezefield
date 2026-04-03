@@ -20,5 +20,6 @@ end
 
 bf.Collider = Collider
 bf.World = World
+bf.stealth = require(... .. '/stealth')
 
 return bf
