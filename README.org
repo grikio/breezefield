@@ -212,3 +212,16 @@ little_ball.identity = little_ball
 ** forum
    [[https://love2d.org/forums/viewtopic.php?f=5&t=86113&p=224718#p224718][forum]]
    
+
+* topdown stealth foundation modules
+A modular stealth foundation has been added under =stealth/=.
+
+- See =docs/stealth_foundation.md= for setup and usage.
+- Run sample scene with =love test/stealth_demo=.
+
+This layer keeps collision/world setup in Breezefield while adding gameplay-oriented systems for:
+
+- topdown movement
+- guard proximity and line-of-sight checks
+- trigger enter/stay/exit events
+- debug rendering and data-driven tuning
