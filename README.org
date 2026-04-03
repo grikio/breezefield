@@ -214,10 +214,10 @@ little_ball.identity = little_ball
    
 
 * topdown stealth foundation modules
-A modular stealth foundation has been added under =stealth/=.
+A modular stealth foundation is available under =stealth/= for top-down stealth gameplay.
 
-- See =docs/stealth_foundation.md= for setup and usage.
-- Run sample scene with =love test/stealth_demo=.
+- Full guide: =docs/stealth_foundation.md=
+- Sample scene: =love test/stealth_demo=
 
 This layer keeps collision/world setup in Breezefield while adding gameplay-oriented systems for:
 
@@ -225,3 +225,75 @@ This layer keeps collision/world setup in Breezefield while adding gameplay-orie
 - guard proximity and line-of-sight checks
 - trigger enter/stay/exit events
 - debug rendering and data-driven tuning
+
+** quick stealth snippets
+*** load modules and create a stealth world
+#+BEGIN_SRC lua
+local bf = require("breezefield")
+local stealth = require("stealth")
+local cfg = require("stealth.config")
+
+function love.load()
+  local base_world = bf.newWorld(0, 0, true)
+  world = stealth.World.new(base_world)
+
+  player = world:createCollider({
+    shape = "circle",
+    args = {80, 80, cfg.player.radius},
+    body_type = "dynamic",
+    kind = "player",
+    tag = "player",
+    category = stealth.layers.player,
+  })
+end
+#+END_SRC
+
+*** create a guard with perception
+#+BEGIN_SRC lua
+guard = world:createCollider({
+  shape = "circle",
+  args = {300, 120, cfg.guard.radius},
+  body_type = "kinematic",
+  kind = "guard",
+  tag = "guard",
+  category = stealth.layers.guard,
+})
+
+perception = stealth.Perception.new(world, guard, player, cfg.guard)
+perception:setFacing(1, 0)
+#+END_SRC
+
+*** add a trigger zone
+#+BEGIN_SRC lua
+stealth.Triggers.newZone(world, {
+  shape = "rectangle",
+  args = {500, 100, 120, 80},
+  tag = "restricted",
+  on_enter = function(zone, actor)
+    print(actor.tag .. " entered restricted area")
+  end,
+})
+#+END_SRC
+
+*** update and debug draw
+#+BEGIN_SRC lua
+local move = stealth.Movement.new(player, cfg.player)
+local debug = stealth.DebugDraw.new()
+
+action_key = "f1"
+
+function love.update(dt)
+  move:update(dt)
+  perception:update(dt)
+  world:update(dt)
+end
+
+function love.keypressed(key)
+  if key == action_key then debug:toggle() end
+end
+
+function love.draw()
+  world:draw()
+  debug:draw(world)
+end
+#+END_SRC
